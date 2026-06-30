@@ -238,6 +238,7 @@
       gap: 0.35rem;
       font-size: 0.8rem;
       font-weight: 600;
+      font-family: 'Inter', sans-serif;
       color: var(--accent);
       text-decoration: none;
       border: 1px solid var(--accent-light);
@@ -246,6 +247,7 @@
       border-radius: 100px;
       transition: all 0.15s;
       white-space: nowrap;
+      cursor: pointer;
     }
     .download-btn:hover {
       background: var(--accent);
@@ -266,6 +268,136 @@
 
     /* HIDDEN UTILITY */
     .hidden { display: none !important; }
+
+    /* MODAL OVERLAY */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(26,26,46,0.55);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--white);
+      border-radius: 10px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+      width: 100%;
+      max-width: 560px;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 1.4rem 1.6rem 1rem;
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .modal-header-text {}
+    .modal-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.3rem;
+    }
+    .modal-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.15rem;
+      color: var(--ink);
+      line-height: 1.3;
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      color: var(--ink-soft);
+      cursor: pointer;
+      padding: 0.1rem 0.3rem;
+      border-radius: 4px;
+      line-height: 1;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .modal-close:hover { background: var(--tag-bg); }
+
+    .modal-body {
+      overflow-y: auto;
+      flex: 1;
+      padding: 0.6rem 1.6rem;
+    }
+
+    .lesson-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.7rem 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    .lesson-row:last-child { border-bottom: none; }
+    .lesson-info {}
+    .lesson-num {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .lesson-name {
+      font-size: 0.9rem;
+      color: var(--ink);
+      font-weight: 500;
+      margin-top: 0.1rem;
+    }
+    .lesson-dl {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+      border: 1px solid var(--accent-light);
+      background: var(--accent-light);
+      padding: 0.28rem 0.75rem;
+      border-radius: 100px;
+      white-space: nowrap;
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+    .lesson-dl:hover { background: var(--accent); color: var(--white); }
+
+    .modal-footer {
+      padding: 1rem 1.6rem 1.4rem;
+      border-top: 1px solid var(--rule);
+    }
+    .modal-dl-all {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      width: 100%;
+      padding: 0.65rem 1rem;
+      background: var(--accent);
+      color: var(--white);
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: var(--radius);
+      transition: opacity 0.15s;
+    }
+    .modal-dl-all:hover { opacity: 0.88; }
   </style>
 </head>
 <body>
@@ -417,7 +549,7 @@
         <p class="card-desc">From rounding to the nearest 10, 100 and 1,000 to decimal places and significant figures. Eight ready-to-use lesson PowerPoints.</p>
         <div class="card-meta">
           <div class="card-tags"><span class="tag">8 Lessons</span><span class="tag">PowerPoint</span></div>
-          <a href="resources/year8/Year8_Rounding_and_Estimation.zip" class="download-btn" download>&#8595; Download all</a>
+          <button class="download-btn" onclick="openLessons('y8-rounding')">&#8595; View lessons</button>
         </div>
       </div>
       <div class="card">
@@ -508,7 +640,7 @@
         <p class="card-desc">Similar and congruent shapes, scale factors, congruence conditions, and Pythagoras' theorem in 2D contexts. Sixteen ready-to-use lesson PowerPoints.</p>
         <div class="card-meta">
           <div class="card-tags"><span class="tag">16 Lessons</span><span class="tag">PowerPoint</span></div>
-          <a href="resources/year9/Year9_Geometry_Similarity_Pythagoras.zip" class="download-btn" download>&#8595; Download all</a>
+          <button class="download-btn" onclick="openLessons('y9-similarity')">&#8595; View lessons</button>
         </div>
       </div>
       <div class="card">
@@ -686,7 +818,25 @@
   <p style="margin-top:1rem"><a href="mailto:hello@cindysmaths.com" id="contact">hello@cindysmaths.com</a></p>
 </footer>
 
+<!-- LESSONS MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOnOverlay(event)">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title-text">
+    <div class="modal-header">
+      <div class="modal-header-text">
+        <div class="modal-eyebrow" id="modal-eyebrow"></div>
+        <div class="modal-title" id="modal-title-text"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()" aria-label="Close">&#10005;</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer">
+      <a id="modal-dl-all" href="#" class="modal-dl-all" download>&#8595;&nbsp; Download all lessons (ZIP)</a>
+    </div>
+  </div>
+</div>
+
 <script>
+  /* ── Year filter ── */
   function filterYear(year, el) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     el.classList.add('active');
@@ -698,6 +848,84 @@
       }
     });
   }
+
+  /* ── Lesson data ── */
+  const LESSONS = {
+    'y8-rounding': {
+      eyebrow: 'Year 8 · Number · 8 lessons',
+      title: 'Estimation &amp; Rounding',
+      zip: 'resources/year8/Year8_Rounding_and_Estimation.zip',
+      base: 'resources/year8/',
+      lessons: [
+        { num: 1, title: 'Rounding to the Nearest 10',           file: 'L1_Rounding_to_the_Nearest_10.pptx' },
+        { num: 2, title: 'Rounding to the Nearest 100',          file: 'L2_Rounding_to_the_Nearest_100.pptx' },
+        { num: 3, title: 'Rounding to the Nearest 1,000',        file: 'L3_Rounding_to_the_Nearest_1000.pptx' },
+        { num: 4, title: 'Rounding to the Nearest Integer',      file: 'L4_Rounding_to_the_Nearest_Integer.pptx' },
+        { num: 5, title: 'Rounding to 1 Decimal Place',          file: 'L5_Rounding_to_1_Decimal_Place.pptx' },
+        { num: 6, title: 'Rounding to 2 Decimal Places',         file: 'L6_Rounding_to_2_Decimal_Places.pptx' },
+        { num: 7, title: 'Rounding to 1 Significant Figure',     file: 'L7_Rounding_to_1_Significant_Figure.pptx' },
+        { num: 8, title: 'Rounding to 2 Significant Figures',    file: 'L8_Rounding_to_2_Significant_Figures.pptx' },
+      ]
+    },
+    'y9-similarity': {
+      eyebrow: 'Year 9 · Geometry · 16 lessons',
+      title: 'Geometrical Properties: Similarity &amp; Pythagoras’ Theorem',
+      zip: 'resources/year9/Year9_Geometry_Similarity_Pythagoras.zip',
+      base: 'resources/year9/',
+      lessons: [
+        { num: 1,  title: 'Introducing Similar Shapes',                  file: 'L1_Introducing_Similar_Shapes.pptx' },
+        { num: 2,  title: 'Scale Factors',                               file: 'L2_Scale_Factors.pptx' },
+        { num: 3,  title: 'Finding Missing Lengths',                     file: 'L3_Finding_Missing_Lengths.pptx' },
+        { num: 4,  title: 'Similar Triangles',                           file: 'L4_Similar_Triangles.pptx' },
+        { num: 5,  title: 'Introducing Congruence',                      file: 'L5_Introducing_Congruence.pptx' },
+        { num: 6,  title: 'Congruence Conditions (SSS, SAS, ASA, RHS)', file: 'L6_Congruence_Conditions.pptx' },
+        { num: 7,  title: 'Similar vs Congruent – Problem Solving',      file: 'L7_Similar_vs_Congruent.pptx' },
+        { num: 8,  title: 'Similarity &amp; Congruence: Applications',  file: 'L8_Problem_Solving_Similarity_Congruence.pptx' },
+        { num: 9,  title: 'Introducing Pythagoras’ Theorem',       file: 'L9_Introducing_Pythagoras_Theorem.pptx' },
+        { num: 10, title: 'Finding the Hypotenuse',                      file: 'L10_Finding_the_Hypotenuse.pptx' },
+        { num: 11, title: 'Finding a Shorter Side',                      file: 'L11_Finding_a_Shorter_Side.pptx' },
+        { num: 12, title: 'Mixed Practice – Any Missing Side',           file: 'L12_Mixed_Pythagoras.pptx' },
+        { num: 13, title: 'Pythagoras in Real Life',                     file: 'L13_Pythagoras_Real_Life.pptx' },
+        { num: 14, title: 'Pythagoras and Coordinates',                  file: 'L14_Pythagoras_Coordinates.pptx' },
+        { num: 15, title: 'Pythagoras in Other Shapes',                  file: 'L15_Pythagoras_Other_Shapes.pptx' },
+        { num: 16, title: 'Mixed Problem Solving &amp; Review',          file: 'L16_Mixed_Problem_Solving.pptx' },
+      ]
+    }
+  };
+
+  /* ── Modal logic ── */
+  function openLessons(key) {
+    const data = LESSONS[key];
+    if (!data) return;
+
+    document.getElementById('modal-eyebrow').innerHTML = data.eyebrow;
+    document.getElementById('modal-title-text').innerHTML = data.title;
+    document.getElementById('modal-dl-all').href = data.zip;
+
+    const body = document.getElementById('modal-body');
+    body.innerHTML = data.lessons.map(l => `
+      <div class="lesson-row">
+        <div class="lesson-info">
+          <div class="lesson-num">Lesson ${l.num}</div>
+          <div class="lesson-name">${l.title}</div>
+        </div>
+        <a class="lesson-dl" href="${data.base}${l.file}" download>&#8595; Download</a>
+      </div>`).join('');
+
+    document.getElementById('modal-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function closeModalOnOverlay(e) {
+    if (e.target === document.getElementById('modal-overlay')) closeModal();
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 </script>
 
 </body>
