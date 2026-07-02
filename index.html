@@ -269,6 +269,44 @@
     /* HIDDEN UTILITY */
     .hidden { display: none !important; }
 
+    /* EMOJI REACTIONS */
+    .card-reaction {
+      margin-top: 0.5rem;
+      padding-top: 0.65rem;
+      border-top: 1px solid var(--rule);
+    }
+    .reaction-label {
+      font-size: 0.7rem;
+      color: var(--ink-soft);
+      margin-bottom: 0.4rem;
+      letter-spacing: 0.03em;
+    }
+    .reaction-btns { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+    .reaction-btn {
+      background: none;
+      border: 1px solid var(--rule);
+      border-radius: 100px;
+      padding: 0.22rem 0.65rem;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      color: var(--ink-soft);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.4;
+    }
+    .reaction-btn:hover { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+    .reaction-btn.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); font-weight: 600; }
+    .reaction-thanks {
+      font-size: 0.7rem;
+      color: var(--accent);
+      margin-top: 0.35rem;
+      display: none;
+    }
+    .reaction-thanks.show { display: block; }
+
     /* MODAL OVERLAY */
     .modal-overlay {
       display: none;
@@ -815,7 +853,11 @@
 <footer id="about">
   <p style="margin-bottom:0.5rem;font-family:'DM Serif Display',serif;font-size:1.1rem;color:var(--ink)">Made by a teacher, for teachers.</p>
   <p>Personalised, designed and created resources for Years 7–11. All free to download and use in your classroom.</p>
-  <p style="margin-top:1rem"><a href="mailto:hello@cindysmaths.com" id="contact">hello@cindysmaths.com</a></p>
+  <p style="margin-top:1.25rem">
+    <a href="mailto:cindyzhangmanton@gmail.com?subject=5MinuteMaths%20feedback&body=Hi%20Cindy%2C%20I%20wanted%20to%20share%20my%20experience%20with%20your%20resources%3A%0A%0A" id="contact">✉️ Share your experience</a>
+    &ensp;·&ensp;
+    <span style="color:var(--ink-soft)">Completely optional — your thoughts help improve these resources.</span>
+  </p>
 </footer>
 
 <!-- LESSONS MODAL -->
@@ -926,6 +968,50 @@
   }
 
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  /* ── Emoji reactions ── */
+  const REACTIONS = [
+    { emoji: '👍', label: 'Helpful' },
+    { emoji: '⭐', label: 'Love it' },
+    { emoji: '💡', label: 'Has suggestions' },
+  ];
+
+  function cardKey(card) {
+    return 'reaction:' + (card.querySelector('.card-title')?.textContent?.trim() || Math.random());
+  }
+
+  function initReactions() {
+    document.querySelectorAll('.card').forEach(card => {
+      const key = cardKey(card);
+      const saved = localStorage.getItem(key);
+
+      const wrap = document.createElement('div');
+      wrap.className = 'card-reaction';
+      wrap.innerHTML = `
+        <div class="reaction-label">Was this useful?</div>
+        <div class="reaction-btns">
+          ${REACTIONS.map(r => `
+            <button class="reaction-btn${saved === r.label ? ' selected' : ''}"
+                    data-label="${r.label}" aria-label="${r.label}">
+              ${r.emoji} ${r.label}
+            </button>`).join('')}
+        </div>
+        <div class="reaction-thanks${saved ? ' show' : ''}">Thanks for your feedback! 🙌</div>`;
+
+      wrap.querySelectorAll('.reaction-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const label = btn.dataset.label;
+          localStorage.setItem(key, label);
+          wrap.querySelectorAll('.reaction-btn').forEach(b => b.classList.toggle('selected', b.dataset.label === label));
+          wrap.querySelector('.reaction-thanks').classList.add('show');
+        });
+      });
+
+      card.appendChild(wrap);
+    });
+  }
+
+  initReactions();
 </script>
 
 </body>
